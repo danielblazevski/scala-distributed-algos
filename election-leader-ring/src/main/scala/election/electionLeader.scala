@@ -17,15 +17,14 @@ class node(var id: Int, var leaderGuess: Int, var leftNeighbor: node, var rightN
     this.id
   }
 }
-
-case class isLeaderComp(from: node, to: node)
 case class passLeaderGuess(from: node, to: node)
 
-
+// timeout for actors
 object MyImplicits{
   implicit val timeout = Timeout(1 second)
 }
 
+// main class
 class Ring(numNodes: Int, system: ActorSystem, nodes: Array[node]) {
   import MyImplicits._
 
@@ -95,6 +94,8 @@ class Ring(numNodes: Int, system: ActorSystem, nodes: Array[node]) {
 object Main extends App {
   val numNodes = 10
 
+  // define the node ring
+  // TODO: clean up input node ring and/or move elsewhere
   var root = new node(0, 0, null, null)
   var current = root
   var nodeMap = new scala.collection.mutable.HashMap[Int, node]()
@@ -107,6 +108,7 @@ object Main extends App {
   current.leftNeighbor = root
 
   // hacky, just using a map to define right neighbors for now
+  // but this only defines the input ring
   current = root
   (0 until numNodes).foreach{ i =>
     current.rightNeighbor = nodeMap(numNodes  - 1 - i)
@@ -114,7 +116,8 @@ object Main extends App {
   }
 
   // put in Array, since don't like the idea of the network taking "root" as a input
-  // since that signals priority to a node
+  // since that signals priority to a node, somewhat defeating the purpose of choosing a
+  // distinguished node
   val nodes = new Array[node](numNodes)
   current = root
   (0 until numNodes).foreach{ i =>
