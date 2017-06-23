@@ -53,6 +53,9 @@ class Ring(numNodes: Int, system: ActorSystem, nodes: Array[node]) {
     // if we make it to the end of the out phase, send message back in
     // a process does not send messages again if it did not receive both incoming messages
 
+
+    // only shared state variable is nodeSet
+    // actors used to mimic communication between nodes in nodeSet
     var nodeSet = new scala.collection.mutable.HashSet[node]()
     nodes.foreach{n => nodeSet.add(n)}
 
