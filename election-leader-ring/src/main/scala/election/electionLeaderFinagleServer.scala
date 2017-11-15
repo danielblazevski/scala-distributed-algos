@@ -3,7 +3,7 @@ package election
 import com.twitter.finagle.Http
 import com.twitter.util.Await
 
-object electionLeaderFinagle  {
+object electionLeaderFinagleServer  {
 
   def main(args: Array[String]) {
     val portEnding = args(0)
