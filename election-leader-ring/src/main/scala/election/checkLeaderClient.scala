@@ -6,7 +6,7 @@ import com.twitter.finagle.{Http, Service}
 import com.twitter.finagle.http
 import com.twitter.util.Await
 
-object Client {
+object checkLeaderClient {
   def main(args: Array[String]): Unit = {
 
     // assume portEnding are from 10 to 99, so ports are from 8000 to 8099
