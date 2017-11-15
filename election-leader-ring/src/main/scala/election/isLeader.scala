@@ -7,7 +7,6 @@ import com.twitter.util.{Await, Future}
 
 class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Response] {
 
-
   private def getFormattedPort(port: Int,
                                direction: String,
                                numPorts: Int) = {
@@ -30,6 +29,8 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
     val client: Service[http.Request, http.Response] = Http.newService(s"localhost:80${port}")
     val request = http.Request(http.Method.Post,
       s"/?fromId=${id}&iterRemaining=${iterRemaining}&isIncoming=${isIncoming}&direction=${direction}&numPorts=${numPorts}&phase=${phase}")
+    println(s"posting /?fromId=${id}&iterRemaining=${iterRemaining}&isIncoming=${isIncoming}&direction=${direction}&numPorts=${numPorts}&phase=${phase}" +
+      s"to port 80${port}")
     client(request)
   }
 
@@ -59,17 +60,17 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
             }
           }
           val formattedPort = getFormattedPort(portEnding, direction, numPorts)
-          Await.result(makeClientRequest(fromId, iterRemaining,isIncoming, direction, numPorts, phase, formattedPort))
+          Await.result(makeClientRequest(fromId, iterRemaining, isIncoming, direction, numPorts, phase, formattedPort))
         }
         case x if x > 0 => {
           println("not the leader!")
           val response = http.Response(request.version, http.Status.Ok)
-          response.setContentString(s"${false.toString}\n")
           response
         }
         case 0 => {
           println("leader found!")
           val pw = new PrintWriter(new File(s"data/leader${fromId}")); pw.write(s"leader id = ${id}"); pw.close()
+          println("want to send OK status!")
           val response = http.Response(request.version, http.Status.Ok)
           response
         }

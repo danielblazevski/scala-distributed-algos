@@ -25,9 +25,9 @@ object checkLeaderClient {
     while (unsureIfLeader){
       phase = phase + 1
       println(s"phase ${phase}" )
-      val leftRequest = http.Request(http.Method.Get,
+      val leftRequest = http.Request(http.Method.Post,
         s"/?fromId=${id}&iterRemaining=${phase}&isIncoming=false&direction=left&numPorts=${numPorts}&phase=${phase}")
-      val rightRequest = http.Request(http.Method.Get,
+      val rightRequest = http.Request(http.Method.Post,
       s"/?fromId=${id}&iterRemaining=${phase}&isIncoming=false&direction=right&numPorts=${numPorts}&phase=${phase}")
 
       val leftResponse = leftClient(leftRequest)
