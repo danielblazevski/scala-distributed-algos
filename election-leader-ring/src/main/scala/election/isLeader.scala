@@ -8,7 +8,10 @@ import com.twitter.util.{Await, Future}
 class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Response] {
 
 
-  private def getFormattedPort(port: Int, direction: String, numPorts: Int) = {
+  private def getFormattedPort(port: Int,
+                               direction: String,
+                               numPorts: Int) = {
+
     val portDirection = direction match {
       case "left" => Math.floorMod(portEnding - 1, numPorts)
       case "right" => Math.floorMod(portEnding + 1, numPorts)
@@ -16,7 +19,14 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
     "%02d".format(portDirection)
   }
 
-  private def makeClientRequest(id: Int, iterRemaining: Int, isIncoming: Boolean, direction: String, numPorts: Int, phase: Int, port: String): Future[http.Response] = {
+  private def makeClientRequest(id: Int,
+                                iterRemaining: Int,
+                                isIncoming: Boolean,
+                                direction: String,
+                                numPorts: Int,
+                                phase: Int,
+                                port: String): Future[http.Response] = {
+
     val client: Service[http.Request, http.Response] = Http.newService(s"localhost:80${port}")
     val request = http.Request(http.Method.Post,
       s"/?fromId=${id}&iterRemaining=${iterRemaining}&isIncoming=${isIncoming}&direction=${direction}&numPorts=${numPorts}&phase=${phase}")
@@ -52,9 +62,9 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
           Await.result(makeClientRequest(fromId, iterRemaining,isIncoming, direction, numPorts, phase, formattedPort))
         }
         case x if x > 0 => {
+          println("not the leader!")
           val response = http.Response(request.version, http.Status.Ok)
           response.setContentString(s"${false.toString}\n")
-          println("not the leader!")
           response
         }
         case 0 => {

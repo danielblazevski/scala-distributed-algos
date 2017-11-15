@@ -14,8 +14,7 @@ object checkLeaderClient {
     val id = args(1).toInt
 
     val numPorts = 3
-    var isLeader = false
-    var isMaybeLeader = true
+    var unsureIfLeader = true
     var phase = 0
 
     val leftPort = "%02d".format(Math.floorMod(portEnding - 1 , numPorts))
@@ -23,7 +22,7 @@ object checkLeaderClient {
     val leftClient: Service[http.Request, http.Response] = Http.newService(s"localhost:80${leftPort}")
     val rightClient: Service[http.Request, http.Response] = Http.newService(s"localhost:80${rightPort}")
 
-    while (isMaybeLeader){
+    while (unsureIfLeader){
       phase = phase + 1
       println(s"phase ${phase}" )
       val leftRequest = http.Request(http.Method.Get,
@@ -40,13 +39,14 @@ object checkLeaderClient {
       Await.result(rightResponse.onSuccess{
         response => println(response)
       })
-      if (!(new java.io.File(s"data/phase_success_${id}_left_${phase}").exists) ||
-        !(new java.io.File(s"data/phase_success_${id}_right_${phase}").exists)){
-        println("not moving to next phase!")
-        isMaybeLeader = false
+      if (!(new File(s"data/phase_success_${id}_left_${phase}").exists) ||
+        !(new File(s"data/phase_success_${id}_right_${phase}").exists)){
+        println("not moving to next phase not the leader!")
+        unsureIfLeader = false
       }
       if (new java.io.File(s"data/leader${id}").exists){
-        isMaybeLeader = false
+        println("you are the leader!")
+        unsureIfLeader = false
       }
     }
   }
