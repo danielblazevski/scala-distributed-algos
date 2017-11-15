@@ -59,8 +59,8 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
             }
           }
           val formattedPort = getFormattedPort(portEnding, direction, numPorts)
-          val response = makeClientRequest(fromId, iterRemaining, isIncoming, direction, numPorts, phase, formattedPort)
-          response
+          val responseFuture = makeClientRequest(fromId, iterRemaining, isIncoming, direction, numPorts, phase, formattedPort)
+          responseFuture
         }
         case x if x > 0 => {
           println("not the leader!")
@@ -103,8 +103,8 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
         }
       } else {
         val formattedPort = getFormattedPort(portEnding, direction, numPorts)
-        val response = makeClientRequest(fromId, iterRemaining,isIncoming, direction, numPorts, phase, formattedPort)
-        response
+        val responseFuture = makeClientRequest(fromId, iterRemaining,isIncoming, direction, numPorts, phase, formattedPort)
+        responseFuture
       }
     }
 
