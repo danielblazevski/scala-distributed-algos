@@ -35,7 +35,6 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
   }
 
   def outgoingHandler(request: http.Request): Future[http.Response] = {
-    Future {
       val fromId = request.getIntParam("fromId")
       var iterRemaining = request.getIntParam("iterRemaining")
       var isIncoming = request.getBooleanParam("isIncoming")
@@ -60,26 +59,29 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
             }
           }
           val formattedPort = getFormattedPort(portEnding, direction, numPorts)
-          Await.result(makeClientRequest(fromId, iterRemaining, isIncoming, direction, numPorts, phase, formattedPort))
+          val response = makeClientRequest(fromId, iterRemaining, isIncoming, direction, numPorts, phase, formattedPort)
+          response
         }
         case x if x > 0 => {
           println("not the leader!")
-          val response = http.Response(request.version, http.Status.Ok)
-          response
+          Future {
+            val response = http.Response(request.version, http.Status.Ok)
+            response
+          }
         }
         case 0 => {
           println("leader found!")
           val pw = new PrintWriter(new File(s"data/leader${fromId}")); pw.write(s"leader id = ${id}"); pw.close()
           println("want to send OK status!")
-          val response = http.Response(request.version, http.Status.Ok)
-          response
+          Future {
+            val response = http.Response(request.version, http.Status.Ok)
+            response
+          }
         }
       }
     }
-  }
 
   def incomingHandler(request: http.Request): Future[http.Response] = {
-    Future {
       val fromId = request.getIntParam("fromId")
       var isIncoming = request.getBooleanParam("isIncoming")
       var direction = request.getParam("direction")
@@ -93,17 +95,18 @@ class isLeader(id: Int, portEnding: Int) extends Service[http.Request, http.Resp
       println("incoming")
 
       if (fromId == id) {
-        val response = http.Response(request.version, http.Status.Ok)
-        response.setContentString(s"${false.toString}\n")
-        println(s"finished with phase = ${phase}")
-        val pw = new PrintWriter(new File(s"data/phase_success_${fromId}_${direction}_${phase}")); pw.write(s"id = ${id}"); pw.close()
-        response
+        Future {
+          val response = http.Response(request.version, http.Status.Ok)
+          println(s"finished with phase = ${phase}")
+          val pw = new PrintWriter(new File(s"data/phase_success_${fromId}_${direction}_${phase}"));pw.write(s"id = ${id}");pw.close()
+          response
+        }
       } else {
         val formattedPort = getFormattedPort(portEnding, direction, numPorts)
-        Await.result(makeClientRequest(fromId, iterRemaining,isIncoming, direction, numPorts, phase, formattedPort))
+        val response = makeClientRequest(fromId, iterRemaining,isIncoming, direction, numPorts, phase, formattedPort)
+        response
       }
     }
-  }
 
   override def apply(request: http.Request): Future[http.Response] = {
     val params = request.getParams()
