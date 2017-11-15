@@ -1,6 +1,8 @@
 package election
 
-import com.twitter.finagle.{Service, Http}
+import java.io.File
+
+import com.twitter.finagle.{Http, Service}
 import com.twitter.finagle.http
 import com.twitter.util.Await
 
@@ -22,11 +24,12 @@ object Client {
     val rightClient: Service[http.Request, http.Response] = Http.newService(s"localhost:80${rightPort}")
 
     while (isMaybeLeader){
-      val iterRemaining = phase + 1
-      val leftRequest = http.Request(http.Method.Post,
-        s"/?fromId=${id}&iterRemaining=${iterRemaining}&isIncoming=false&direction=left&numPorts=${numPorts}")
-      val rightRequest = http.Request(http.Method.Post,
-      s"/?fromId=${id}&iterRemaining=${iterRemaining}&isIncoming=false&direction=right&numPorts=${numPorts}")
+      phase = phase + 1
+      println(s"phase ${phase}" )
+      val leftRequest = http.Request(http.Method.Get,
+        s"/?fromId=${id}&iterRemaining=${phase}&isIncoming=false&direction=left&numPorts=${numPorts}&phase=${phase}")
+      val rightRequest = http.Request(http.Method.Get,
+      s"/?fromId=${id}&iterRemaining=${phase}&isIncoming=false&direction=right&numPorts=${numPorts}&phase=${phase}")
 
       val leftResponse = leftClient(leftRequest)
       val rightResponse = rightClient(rightRequest)
@@ -37,6 +40,14 @@ object Client {
       Await.result(rightResponse.onSuccess{
         response => println(response)
       })
+      if (!(new java.io.File(s"data/phase_success_${id}_left_${phase}").exists) ||
+        !(new java.io.File(s"data/phase_success_${id}_right_${phase}").exists)){
+        println("not moving to next phase!")
+        isMaybeLeader = false
+      }
+      if (new java.io.File(s"data/leader${id}").exists){
+        isMaybeLeader = false
+      }
     }
   }
 }
