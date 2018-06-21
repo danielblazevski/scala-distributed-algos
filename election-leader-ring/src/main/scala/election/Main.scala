@@ -3,10 +3,10 @@ package election
 import com.twitter.finagle.Http
 import com.twitter.util.Await
 
-object electionLeaderFinagleServer  {
+object Main  {
 
   def main(args: Array[String]) {
-    // TO-DO: make a config to pass in numPorts
+    // TO-DO: make a config to pass in numPorts, or use command line args
     // and add heartbeat to avoid Thread.sleep call
 
     val portEnding = args(0)
