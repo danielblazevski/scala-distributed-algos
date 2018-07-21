@@ -11,10 +11,9 @@ class CheckLeaderHandler(leaderClient: LeaderClient) {
     while (unsureIfLeader) {
       phase += 1
       println(s"phase ${phase}" )
-      val isIncoming = false
 
-      val leftResponse = leaderClient.checkLeader(id, phase, isIncoming, "left", numPorts, phase, portEnding)
-      val rightResponse = leaderClient.checkLeader(id, phase, isIncoming, "right", numPorts, phase, portEnding)
+      val leftResponse = leaderClient.checkLeader(id, phase, "left", numPorts, phase, portEnding)
+      val rightResponse = leaderClient.checkLeader(id, phase, "right", numPorts, phase, portEnding)
 
       val bodies = Seq(leftResponse, rightResponse).map{ resp =>
         Await.result(resp.onSuccess{

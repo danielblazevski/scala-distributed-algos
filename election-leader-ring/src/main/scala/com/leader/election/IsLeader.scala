@@ -10,8 +10,7 @@ class IsLeader(id: Int, portEnding: Int, leaderClient: LeaderClient) extends Ser
   def outgoingHandler(request: http.Request): Future[http.Response] = {
       val fromId = request.getIntParam("fromId")
       var iterRemaining = request.getIntParam("iterRemaining")
-      var isIncoming = request.getBooleanParam("isIncoming")
-      var direction = request.getParam("direction")
+      val direction = request.getParam("direction")
       val numPorts = request.getIntParam("numPorts")
 
       id - fromId match {
@@ -19,14 +18,9 @@ class IsLeader(id: Int, portEnding: Int, leaderClient: LeaderClient) extends Ser
         case x if x < 0 => {
           iterRemaining -= 1
           if (iterRemaining == 0) {
-            isIncoming = true
-            direction = direction match {
-              case "left" => "right"
-              case "right" => "left"
-            }
-            leaderClient.passTokenInward(fromId, direction, numPorts, portEnding)
+            Future.value(http.Response(request.version, http.Status.Ok, Reader.fromBuf(Buf.Utf8("advance"))))
           } else {
-            leaderClient.checkLeaderOutgoing(fromId, iterRemaining, isIncoming, direction, numPorts, portEnding)
+            leaderClient.checkLeaderOutgoing(fromId, iterRemaining, direction, numPorts, portEnding)
           }
         }
 
@@ -40,27 +34,9 @@ class IsLeader(id: Int, portEnding: Int, leaderClient: LeaderClient) extends Ser
       }
     }
 
-  def incomingHandler(request: http.Request): Future[http.Response] = {
-      val fromId = request.getIntParam("fromId")
-      val direction = request.getParam("direction")
-      val numPorts = request.getIntParam("numPorts")
-
-      if (fromId == id) {
-        Future.value(http.Response(request.version, http.Status.Ok, Reader.fromBuf(Buf.Utf8("advance"))))
-      } else {
-       leaderClient.passTokenInward(fromId, direction, numPorts, portEnding)
-      }
-    }
-
   override def apply(request: http.Request): Future[http.Response] = {
     val params = request.getParams()
     println(params)
-    val isIncoming = request.getBooleanParam("isIncoming", true)
-
-    if (isIncoming) {
-      incomingHandler(request)
-    } else {
-      outgoingHandler(request)
-    }
+    outgoingHandler(request)
   }
 }

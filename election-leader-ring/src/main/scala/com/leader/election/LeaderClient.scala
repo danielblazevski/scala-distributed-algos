@@ -27,7 +27,6 @@ class LeaderClient {
 
   def checkLeaderOutgoing(id: Int,
                           iterRemaining: Int,
-                          isIncoming: Boolean,
                           direction: String,
                           numPorts: Int,
                           portEnding: Int): Future[http.Response] = {
@@ -36,7 +35,6 @@ class LeaderClient {
     val params = Map(
       "fromId" -> id.toString,
       "iterRemaining" -> iterRemaining.toString,
-      "isIncoming" -> isIncoming.toString,
       "direction" -> direction.toString,
       "numPorts" -> numPorts.toString
     )
@@ -60,7 +58,6 @@ class LeaderClient {
 
   def checkLeader(id: Int,
                   iterRemaining: Int,
-                  isIncoming: Boolean,
                   direction: String,
                   numPorts: Int,
                   phase: Int,
@@ -70,7 +67,6 @@ class LeaderClient {
     val params = Map(
       "fromId" -> id.toString,
       "iterRemaining" -> iterRemaining.toString,
-      "isIncoming" -> isIncoming.toString,
       "direction" -> direction.toString,
       "numPorts" -> numPorts.toString,
       "phase" -> phase.toString

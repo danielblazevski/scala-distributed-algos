@@ -19,7 +19,7 @@ object Main  {
     val isLeaderService = new IsLeader(id, portEnding.toInt, leaderClient)
     val server = Http.serve(s":80${portEnding}", isLeaderService)
 
-    Thread.sleep(10000)
+    Thread.sleep(20000)
     // separate thread that checks if the leader
     val checkLeaderHandler = new CheckLeaderHandler(leaderClient)
     checkLeaderHandler.checkIfLeader(portEnding.toInt, id, numPorts)
