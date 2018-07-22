@@ -11,7 +11,7 @@ import org.scalatest.{FlatSpec, Matchers}
 
 class IsLeaderTest extends FlatSpec with Matchers with MockitoSugar {
 
-  "isLeader.outgoingHandler" should "properly handle requests about whether a node is a leader" in {
+  "isLeader.checkLeaderHandler" should "properly handle requests about whether a node is a leader" in {
     val mockedClient = mock[LeaderClient]
     val response = Future.value(http.Response(http.Status.Ok))
     val id = 12
@@ -39,7 +39,7 @@ class IsLeaderTest extends FlatSpec with Matchers with MockitoSugar {
       anyInt())).thenReturn(response)
 
     val isLeader = new IsLeader(id, portEnding, mockedClient)
-    val actual = isLeader.outgoingHandler(request)
+    val actual = isLeader.checkLeaderHandler(request)
 
     verify(mockedClient, times(1)).checkLeaderOutgoing(fromId,
       iterRemaining - 1,
@@ -49,7 +49,7 @@ class IsLeaderTest extends FlatSpec with Matchers with MockitoSugar {
   }
 
 
-  "isLeader.outgoingHandler" should "stop outgoing requests" in {
+  "isLeader.checkLeaderHandler" should "stop outgoing requests" in {
     val mockedClient = mock[LeaderClient]
     val id = 12
     val portEnding = 2
@@ -70,7 +70,7 @@ class IsLeaderTest extends FlatSpec with Matchers with MockitoSugar {
       .buildGet()
 
     val isLeader = new IsLeader(id, portEnding, mockedClient)
-    val actual = isLeader.outgoingHandler(request)
+    val actual = isLeader.checkLeaderHandler(request)
 
     Await.result(actual).status.code shouldBe 200
   }

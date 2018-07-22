@@ -7,7 +7,7 @@ import com.twitter.util.Future
 // TO-DO: add better format of responses instead of simple string "leader", "not leader" (json/proto)
 class IsLeader(id: Int, portEnding: Int, leaderClient: LeaderClient) extends Service[http.Request, http.Response] {
 
-  def outgoingHandler(request: http.Request): Future[http.Response] = {
+  def checkLeaderHandler(request: http.Request): Future[http.Response] = {
       val fromId = request.getIntParam("fromId")
       var iterRemaining = request.getIntParam("iterRemaining")
       val direction = request.getParam("direction")
@@ -37,6 +37,6 @@ class IsLeader(id: Int, portEnding: Int, leaderClient: LeaderClient) extends Ser
   override def apply(request: http.Request): Future[http.Response] = {
     val params = request.getParams()
     println(params)
-    outgoingHandler(request)
+    checkLeaderHandler(request)
   }
 }
