@@ -1,6 +1,6 @@
 ## Leader election using Finagle
 
-This is an implementation of the hirschberg and Sinclair algorithm for
+This is an implementation of the Hirschberg and Sinclair algorithm for
 leader election in a ring using [Finagle](https://twitter.github.io/finagle/) for RPCs.  
 
 This was done as a hack project and not meant to be used in production anywhere.  
